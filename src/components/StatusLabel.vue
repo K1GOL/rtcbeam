@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div class="my-6 mx-auto text-2xl">
     <p>{{ store.appStatus }}</p>
   </div>
 </template>
