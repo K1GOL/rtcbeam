@@ -1,5 +1,5 @@
 <template>
-  <div class="border-4 block border-black rounded-xl my-6 mx-auto p-6 w-fit text-lg">
+  <div class="border-4 block border-black rounded-xl my-6 mx-auto p-6 w-fit text-lg shadow-[5px_5px]">
     <h1 class="font-semibold text-4xl m-3">Send files</h1>
     <span tabindex="0" @click="buttonClick" class="m-6 inline-block p-2 border-4 border-black rounded-lg hover:ring ring-blue-600 ring-0 transition-all hover:ring-offset-4 ring-offset-transparent duration-200 cursor-pointer">
       <p class="cursor-pointer w-full h-full">Choose file</p>

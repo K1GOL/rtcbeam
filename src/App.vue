@@ -179,6 +179,20 @@ export default {
     store.peer.on('connection', (conn) => {
       this.deliverFile(conn)
     })
+  },
+  mounted () {
+    // Check if both URL parameters for peer and encryption are present,
+    // if yes, start transfering file.
+    const urlPeer = new URLSearchParams(window.location.search).get('peer')
+    const urlEncryption = new URLSearchParams(window.location.search).get('encryption')
+    // Pass a reference to this.
+    const _this = this
+    if (urlPeer && urlEncryption) {
+      // Wait for peerjs to be ready.
+      store.peer.on('open', function (id) {
+        _this.requestFile(urlPeer, (urlEncryption === '1'))
+      })
+    }
   }
 }
 </script>
