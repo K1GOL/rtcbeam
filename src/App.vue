@@ -2,10 +2,12 @@
   <div class="flex-col items-center w-full">
     <h1 class="text-6xl">rtcbeam</h1>
     <p class="text-lg">Peer-to-peer file transfer powered by WebRTC.</p>
+    <SplashScreen/>
     <SendFile/>
     <SaveFile v-if="store.fileReady"/>
     <RecieveFile/>
     <StatusLabel/>
+    <ServerConfigure/>
   </div>
 </template>
 
@@ -19,6 +21,8 @@ import * as nacl from './nacl.min.js'
 import * as naclUtil from './nacl-util.min.js'
 import { v4 as uuidv4 } from 'uuid'
 import { store } from './store.js'
+import ServerConfigure from './components/ServerConfigure.vue'
+import SplashScreen from './components/SplashScreen.vue'
 
 export default {
   name: 'App',
@@ -26,17 +30,20 @@ export default {
     SendFile,
     RecieveFile,
     StatusLabel,
-    SaveFile
+    SaveFile,
+    ServerConfigure,
+    SplashScreen
   },
   data () {
     return {
-      store
+      store,
+      pjs
     }
   },
   methods: {
     deliverFile (conn) {
       // Recieve connection.
-      store.appStatus = 'Connecting to peer...'
+      store.appStatus = '💻 Connecting to peer...'
       conn.on('open', () => {
         // Connection established to peer.
         // Serve file.
@@ -45,7 +52,7 @@ export default {
           if (data.action === 'request-file' && (data.encryptionKey && data.nonce)) {
             // Valid request for file has been recieved.
             // Deliver file.
-            store.appStatus = 'Delivering file to peer...'
+            store.appStatus = '✉️ Delivering file to peer...'
             const file = store.outboundFile
             const mime = file.type
 
@@ -64,7 +71,7 @@ export default {
                 if (data.flags.includes('no-encryption')) {
                   message = new Uint8Array(buf)
                 } else {
-                  store.appStatus = 'Encrypting file...'
+                  store.appStatus = '🔐 Encrypting file...'
                   message = nacl.box(
                     new Uint8Array(buf),
                     naclUtil.decodeBase64(data.nonce),
@@ -82,7 +89,7 @@ export default {
                 // Copy flags from request.
                 const flags = data.flags
                 // Send file over network.
-                store.appStatus = 'Sending file...'
+                store.appStatus = '📡 Sending file...'
                 conn.send(JSON.stringify({
                   action: 'deliver-file',
                   flags: flags,
@@ -100,18 +107,18 @@ export default {
             }
           } else if (data.action === 'confirm-transfer-finish') {
             // Notify transfer completed.
-            store.appStatus = 'File transfer completed.'
+            store.appStatus = '✅ File transfer completed.'
           }
         })
       })
     },
     requestFile (id, encrypt) {
       // Request file.
-      store.appStatus = 'Connecting to peer...'
+      store.appStatus = '💻 Connecting to peer...'
       const conn = store.peer.connect(id)
       conn.on('open', () => {
         // Connection established.
-        store.appStatus = 'Requesting file...'
+        store.appStatus = '❔ Requesting file...'
         // Generate encryption keys.
         const keyPair = nacl.box.keyPair()
         const nonce = nacl.randomBytes(nacl.box.nonceLength)
@@ -137,7 +144,7 @@ export default {
             if (data.flags.includes('no-encryption')) {
               uintArray = naclUtil.decodeBase64(data.message)
             } else {
-              store.appStatus = 'Decrypting file...'
+              store.appStatus = '🔐 Decrypting file...'
               uintArray = nacl.box.open(
                 naclUtil.decodeBase64(data.message),
                 store.nonce,
@@ -151,7 +158,7 @@ export default {
             store.inboundFile = blob
             store.filename = data.metadata.filename
             store.fileReady = true
-            store.appStatus = 'File transfer completed.'
+            store.appStatus = '✅ File transfer completed.'
             // Notify sender that transfer is done.
             conn.send(JSON.stringify({
               action: 'confirm-transfer-finish',
@@ -159,7 +166,7 @@ export default {
             }))
           } else if (data.action === 'notify-transfer-start') {
             // Transfer has started.
-            store.appStatus = 'Recieving file...'
+            store.appStatus = '📨 Recieving file...'
           }
         })
       })
@@ -167,12 +174,12 @@ export default {
   },
   created () {
     // Establish peerjs connection.
-    store.appStatus = 'Establishing connection...'
+    store.appStatus = '📡 Establishing connection...'
     const peer = new pjs.peerjs.Peer('rtb-' + uuidv4())
     store.peer = peer
 
     peer.on('open', function (id) {
-      store.appStatus = 'Connected to network.'
+      store.appStatus = '✅ Connected to network.'
     })
 
     // On incoming connection

@@ -29,7 +29,7 @@ export default {
           this.$parent.requestFile(this.senderPeerId, this.encrypt)
         }
       } catch (err) {
-        store.appStatus = 'An error has occured.'
+        store.appStatus = '❌ An error has occured.'
       }
     }
   }

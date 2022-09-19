@@ -7,6 +7,11 @@ rtcbeam is an end-to-end encrypted peer-to-peer file transfer app powered by Web
 npm install
 ```
 
+### Run Tailwind Css
+```
+npm run tailwindcss
+```
+
 ### Compiles and hot-reloads for development
 ```
 npm run serve
