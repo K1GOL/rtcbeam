@@ -170,17 +170,24 @@ export default {
           }
         })
       })
+    },
+    createPeer (host = '0.peerjs.com') {
+      // Creates a peerjs peer and saves it.
+      store.appStatus = '📡 Establishing connection...'
+      const peer = new pjs.peerjs.Peer('rtb-' + uuidv4(), { host: host })
+      store.peer = peer
+      peer.on('open', function (id) {
+        store.appStatus = '✅ Connected to network.'
+      })
+      peer.on('error', (err) => {
+        store.appStatus = '❌ An error has occured.'
+        console.error(err)
+      })
     }
   },
   created () {
     // Establish peerjs connection.
-    store.appStatus = '📡 Establishing connection...'
-    const peer = new pjs.peerjs.Peer('rtb-' + uuidv4())
-    store.peer = peer
-
-    peer.on('open', function (id) {
-      store.appStatus = '✅ Connected to network.'
-    })
+    this.createPeer()
 
     // On incoming connection
     store.peer.on('connection', (conn) => {
@@ -188,13 +195,19 @@ export default {
     })
   },
   mounted () {
-    // Check if both URL parameters for peer and encryption are present,
+    // Check if URL parameters for peer, host and encryption are present,
     // if yes, start transfering file.
-    const urlPeer = new URLSearchParams(window.location.search).get('peer')
+    const urlPeer = decodeURIComponent(new URLSearchParams(window.location.search).get('peer'))
+    const urlHost = decodeURIComponent(new URLSearchParams(window.location.search).get('host'))
     const urlEncryption = new URLSearchParams(window.location.search).get('encryption')
     // Pass a reference to this.
     const _this = this
-    if (urlPeer && urlEncryption) {
+    if (urlPeer && urlEncryption && urlHost) {
+      // Check if host is not equal to current one.
+      if (urlHost !== store.peer.options.host) {
+        // Connect to host.
+        this.createPeer(urlHost)
+      }
       // Wait for peerjs to be ready.
       store.peer.on('open', function (id) {
         _this.requestFile(urlPeer, (urlEncryption === '1'))

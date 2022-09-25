@@ -16,8 +16,6 @@
 <script>
 
 import { store } from '../store.js'
-import * as pjs from '../peerjs.min.js'
-import { v4 as uuidv4 } from 'uuid'
 
 export default {
   name: 'ServerConfigure',
@@ -34,13 +32,7 @@ export default {
     },
     configureServer () {
       // Connect to a PeerServer with a URL provided by the user.
-      store.appStatus = '📡 Establishing connection...'
-      const peer = new pjs.peerjs.Peer('rtb-' + uuidv4(), { host: this.serverUrl })
-      store.peer = peer
-      peer.on('open', function (id) {
-        store.appStatus = '✅ Connected to network.'
-      })
-
+      this.$parent.createPeer(this.serverUrl)
       // Hide modal.
       this.$refs.modal.style.display = 'none'
     }
