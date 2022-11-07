@@ -1,7 +1,7 @@
 <template>
   <div id="splash" ref="splash" class="flex justify-center w-full h-full fixed top-0 right-0 z-20 m-0">
     <div class="inline-block m-auto">
-      <h1 class="text-9xl m-auto">rtcbeam</h1>
+      <h1 class="text-6xl sm:text-9xl m-auto">rtcbeam</h1>
       <div id="bar" class="bg-[#2c3e50] rounded-lg h-2 m-auto"></div>
       <StatusLabel/>
     </div>

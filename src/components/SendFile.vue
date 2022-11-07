@@ -9,6 +9,7 @@
     <span v-if="fileSelected" tabindex="0" @click="copyLink" class="m-6 inline-block p-2 border-4 border-black rounded-lg hover:ring ring-blue-600 ring-0 transition-all hover:ring-offset-4 ring-offset-transparent duration-200 cursor-pointer">
       <p class="cursor-pointer w-full h-full">🔗 Copy link</p>
     </span>
+    <QrCode v-if="fileSelected" />
     <p v-if="linkCopied" class="absolute text-center w-32 left-0 right-0 mx-auto my-0">Link copied!</p>
   </div>
 </template>
@@ -16,9 +17,13 @@
 <script>
 
 import { store } from '../store.js'
+import QrCode from './QrCode.vue'
 
 export default {
   name: 'SendFile',
+  components: {
+    QrCode
+  },
   data () {
     return {
       store,

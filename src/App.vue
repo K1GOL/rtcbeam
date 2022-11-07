@@ -224,7 +224,7 @@ export default {
 
 body {
   background: linear-gradient(332deg, rgba(137,232,191,1) 0%, rgba(62,203,90,1) 100%);
-  height: 100%;
+  height: 100wh;
   margin: 0;
   background-repeat: no-repeat;
   background-attachment: fixed;
