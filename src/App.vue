@@ -19,7 +19,7 @@ import SaveFile from './components/SaveFile.vue'
 import { store } from './store.js'
 import ServerConfigure from './components/ServerConfigure.vue'
 import SplashScreen from './components/SplashScreen.vue'
-import * as core from './rtcbeam-core/index.js'
+import * as core from 'rtcbeam-core'
 
 export default {
   name: 'App',
@@ -44,15 +44,12 @@ export default {
       core.requestFile(id, encrypt, store)
     },
     createPeer (host) {
-      core.createPeer(host, store)
+      return core.createPeer(store, host)
     }
   },
   created () {
     // Establish peerjs connection.
-    this.createPeer()
-
-    // On incoming connection
-    store.peer.on('connection', (conn) => {
+    this.createPeer().on('connection', (conn) => {
       this.deliverFile(conn)
     })
   },

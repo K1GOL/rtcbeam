@@ -8,7 +8,7 @@
 <script>
 
 import { store } from '../store.js'
-import * as core from '../rtcbeam-core/index.js'
+import * as core from 'rtcbeam-core'
 
 export default {
   name: 'StatusLabel',
