@@ -1,5 +1,5 @@
 import { reactive } from 'vue'
-import { version } from '../package.json'
+import { version } from './version.js'
 
 export const store = reactive({
   appStatus: 'Ready.',
