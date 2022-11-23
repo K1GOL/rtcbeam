@@ -30,8 +30,8 @@ export default {
       // Shows modal.
       this.$refs.modal.style.display = 'flex'
       // Draw QR code
-      const url = `https://rtc-beam.web.app?peer=${encodeURIComponent(store.peer.id)}&host=${encodeURIComponent(store.peer.options.host)}&encryption=1`
-      QRCode.toCanvas(document.getElementById('canvas'), url, function (error) {
+      const url = `https://rtc-beam.web.app?peer=${encodeURIComponent(store.core.peer.id)}&cid=${encodeURIComponent(store.latestOutboundCid)}&host=${encodeURIComponent(store.core.peer.options.host)}&encryption=1`
+      QRCode.toCanvas(document.getElementById('canvas'), url, (error) => {
         if (error) console.error(error)
         console.log('success!')
       })

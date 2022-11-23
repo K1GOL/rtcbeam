@@ -25,8 +25,9 @@ export default {
   methods: {
     transferFile () {
       try {
-        if (this.senderPeerId) {
-          this.$parent.requestFile(this.senderPeerId, this.encrypt)
+        const split = this.senderPeerId.split('/')
+        if (split.length === 2) {
+          this.$parent.requestFile(split[0], split[1], this.encrypt)
         }
       } catch (err) {
         store.appStatus = '❌ An error has occured.'

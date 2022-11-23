@@ -19,7 +19,7 @@ import SaveFile from './components/SaveFile.vue'
 import { store } from './store.js'
 import ServerConfigure from './components/ServerConfigure.vue'
 import SplashScreen from './components/SplashScreen.vue'
-import * as core from 'rtcbeam-core'
+import { Rtcbeam } from 'rtcbeam-core'
 
 export default {
   name: 'App',
@@ -37,39 +37,45 @@ export default {
     }
   },
   methods: {
-    deliverFile (conn) {
-      core.deliverFile(conn, store)
-    },
-    requestFile (id, encrypt) {
-      core.requestFile(id, encrypt, store)
+    requestFile (id, cid, encrypt) {
+      store.core.requestData(id, cid, encrypt)
     },
     createPeer (host) {
-      return core.createPeer(store, host)
+      return store.core.createPeer(host)
     }
   },
   created () {
-    // Establish peerjs connection.
-    this.createPeer().on('connection', (conn) => {
-      this.deliverFile(conn)
+    // Create Rtcbeam.
+    store.core = new Rtcbeam()
+    // Link core app status.
+    store.core.on('status', (s) => { store.appStatus = s })
+    // Handle transfer completed.
+    store.core.on('transfer-completed', (blob, metadata) => {
+      store.inboundFile = blob
+      store.filename = metadata.name
+      store.fileReady = true
     })
+    // Handle invalid cid provided.
+    store.core.on('not-found', () => { store.appStatus = '❌ An invalid peer id was provided.' })
   },
   mounted () {
-    // Check if URL parameters for peer, host and encryption are present,
+    // Check if URL parameters for peer, cid, host and encryption are present,
     // if yes, start transfering file.
     const urlPeer = decodeURIComponent(new URLSearchParams(window.location.search).get('peer'))
+    const urlCid = decodeURIComponent(new URLSearchParams(window.location.search).get('cid'))
     const urlHost = decodeURIComponent(new URLSearchParams(window.location.search).get('host'))
     const urlEncryption = new URLSearchParams(window.location.search).get('encryption')
     // Pass a reference to this.
     const _this = this
     if (urlPeer && urlEncryption && urlHost) {
       // Check if host is not equal to current one.
-      if (urlHost !== store.peer.options.host) {
+      if (urlHost !== store.core.peer.options.host) {
         // Connect to host.
         this.createPeer(urlHost)
       }
       // Wait for peerjs to be ready.
-      store.peer.on('open', function (id) {
-        _this.requestFile(urlPeer, (urlEncryption === '1'))
+      store.core.on('ready', () => {
+        _this.requestFile(urlPeer, urlCid, (urlEncryption === '1'))
       })
     }
   }
