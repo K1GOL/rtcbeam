@@ -4,36 +4,40 @@
     <p class="text-lg">Peer-to-peer file transfer powered by WebRTC.</p>
     <SplashScreen/>
     <SendFile/>
+    <ProgressBar v-if="showProgress"/>
     <SaveFile v-if="store.fileReady"/>
-    <RecieveFile/>
+    <ReceiveFile/>
     <StatusLabel/>
     <ServerConfigure/>
   </div>
 </template>
 
 <script>
+import { store } from './store.js'
+import { Rtcbeam } from 'rtcbeam-core'
 import SendFile from './components/SendFile.vue'
-import RecieveFile from './components/RecieveFile.vue'
+import ReceiveFile from './components/ReceiveFile.vue'
 import StatusLabel from './components/StatusLabel.vue'
 import SaveFile from './components/SaveFile.vue'
-import { store } from './store.js'
 import ServerConfigure from './components/ServerConfigure.vue'
 import SplashScreen from './components/SplashScreen.vue'
-import { Rtcbeam } from 'rtcbeam-core'
+import ProgressBar from './components/ProgressBar.vue'
 
 export default {
   name: 'App',
   components: {
     SendFile,
-    RecieveFile,
+    ReceiveFile,
     StatusLabel,
     SaveFile,
     ServerConfigure,
-    SplashScreen
+    SplashScreen,
+    ProgressBar
   },
   data () {
     return {
-      store
+      store,
+      showProgress: false
     }
   },
   methods: {
@@ -42,6 +46,21 @@ export default {
     },
     createPeer (host) {
       return store.core.createPeer(host)
+    },
+    updateProgress (progress) {
+      // If new byte value is larger than current total, update total.
+      if (progress > store.totalBytes) store.totalBytes = progress
+      // Set current bytes transferred.
+      // Use Math.max() to prevent value from dropping by progress updates arriving out of order.
+      store.currentBytes = Math.max(store.currentBytes, store.totalBytes - progress)
+      // Calculate percentage transferred.
+      store.percentage = store.currentBytes / store.totalBytes * 100
+      // Show progress bar when there is progress to show.
+      if (progress > 0) {
+        this.showProgress = true
+      } else {
+        this.showProgress = false
+      }
     }
   },
   created () {
@@ -54,9 +73,13 @@ export default {
       store.inboundFile = blob
       store.filename = metadata.name
       store.fileReady = true
+      this.showProgress = false
     })
     // Handle invalid cid provided.
     store.core.on('not-found', () => { store.appStatus = '❌ An invalid peer id was provided.' })
+    // Handle progress updates.
+    store.core.on('send-progress', (p) => this.updateProgress(p))
+    store.core.on('receive-progress', (p) => this.updateProgress(p))
   },
   mounted () {
     // Check if URL parameters for peer, cid, host and encryption are present,

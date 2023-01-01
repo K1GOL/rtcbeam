@@ -8,5 +8,8 @@ export const store = reactive({
   inboundFile: null,
   latestOutboundCid: null,
   filename: null,
+  currentBytes: 0,
+  totalBytes: 0,
+  percentage: 40,
   version: version
 })
