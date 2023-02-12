@@ -110,10 +110,16 @@ export default {
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Baloo+Thambi+2:wght@800&display=swap');
 
+html {
+  height: 100vh;
+  overflow: hidden;
+}
+
 body {
   background: linear-gradient(332deg, rgba(137,232,191,1) 0%, rgba(62,203,90,1) 100%);
-  height: 100wh;
+  height: 100%;
   margin: 0;
+  overflow-y: scroll;
   background-repeat: no-repeat;
   background-attachment: fixed;
 }
