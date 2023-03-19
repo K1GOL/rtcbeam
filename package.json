@@ -1,6 +1,6 @@
 {
   "name": "rtcbeam",
-  "version": "2.0.3",
+  "version": "2.0.4",
   "author": "K1GOL",
   "scripts": {
     "serve": "npx genversion ./src/version.js --es6 && vue-cli-service serve",
@@ -25,6 +25,7 @@
     "@vue/cli-plugin-eslint": "~5.0.0",
     "@vue/cli-service": "~5.0.0",
     "@vue/eslint-config-standard": "^6.1.0",
+    "caniuse-lite": "^1.0.30001468",
     "eslint": "^7.32.0",
     "eslint-plugin-import": "^2.25.3",
     "eslint-plugin-node": "^11.1.0",
